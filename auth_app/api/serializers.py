@@ -17,3 +17,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         if data['password'] != data['repeatedPassword']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
+
+    def create(self, validated_data):
+        validated_data.pop('repeatedPassword')
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+            complete_name=validated_data['complete_name'],
+        )
+        return user
