@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from auth_app.models import User
+from projects_app.models import Project
 from django.contrib.auth import authenticate
 
 
@@ -39,3 +40,11 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid email or password")
         data['user'] = user
         return data
+
+
+class UserBriefSerializer(serializers.ModelSerializer):
+    completeName = serializers.CharField(source='complete_name')
+
+    class Meta:
+        model = User 
+        fields = ['id', 'email', 'completeName']
