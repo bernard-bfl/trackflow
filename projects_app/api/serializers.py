@@ -21,7 +21,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
             'memberCount',
             'issueCount',
             'openIssueCount',
-            'critcalIssueCount',
+            'criticalIssueCount',
             'ownerId',
         ]
 
