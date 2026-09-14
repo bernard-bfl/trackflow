@@ -6,6 +6,12 @@ from issues_app.models import Issue
 from .serializers import IssueSerializer, IssueWriteSerializer
 from .permissions import IsProjectMemberForIssue, IsReporterOrProjectOwner
 from rest_framework import mixins, generics
+from rest_framework.permissions import IsAuthenticated
+from issues_app.models import Issue, Comment
+from .serializers import CommentSerializer
+from .permissions import IsProjectMemberForComment, IsCommentAuthor
+
+
 
 
 
@@ -57,3 +63,21 @@ class ReportedByMeView(mixins.ListModelMixin, generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        issue_id = self.kwargs.get('issue_id')
+        return Comment.objects.filter(issue_id=issue_id)
+
+    def get_permissions(self):
+        if self.action == 'destroy':
+            return [IsAuthenticated(), IsCommentAuthor()]
+        return [IsAuthenticated(), IsProjectMemberForComment()]
+
+    def perform_create(self, serializer):
+        issue_id = self.kwargs.get('issueId')
+        issue = Issue.objects.get(id=issue_id)
+        serializer.save(issue=issue, author=self.request.user)

@@ -28,13 +28,23 @@ class IsReporterOrProjectOwner(BasePermission):
 
 
 class IsProjectMemberForComment(BasePermission):
+    def has_permission(self, request, view):
+            issue_id = view.kwargs.get('issueId')
+            if not issue_id:
+                return True 
+            try:
+                issue = Issue.objects.get(id=issue_id)
+            except Issue.DoesNotExist:
+                return True 
+            user = request.user 
+            return issue.project.owner == user or user in issue.project.members.all()
     def has_object_permission(self, request, view, obj):
         user = request.user
         return obj.issue.project.owner == user or user in obj.issue.project.members.all()
 
-    def has_permission(self, request, view):
-        issue_id = view.kwargs.get('issueId')
-        if not issue_id:
-            return True 
-        try:
-            issue = Issue.o
+    
+
+
+class IsCommentAuthor(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user
