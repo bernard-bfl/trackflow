@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from projects_app.models import Project
+from issues_app.models import Issue
 
 class IsProjectMemberForIssue(BasePermission):
     def has_permission(self, request, view):
@@ -23,3 +24,17 @@ class IsReporterOrProjectOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
         return obj.reporter == user or obj.project.owner == user
+
+
+
+class IsProjectMemberForComment(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return obj.issue.project.owner == user or user in obj.issue.project.members.all()
+
+    def has_permission(self, request, view):
+        issue_id = view.kwargs.get('issueId')
+        if not issue_id:
+            return True 
+        try:
+            issue = Issue.o

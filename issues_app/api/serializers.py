@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from issues_app.models import Issue
+from issues_app.models import Comment
 from projects_app.models import Project
 from auth_app.api.serializers import UserBriefSerializer
 from auth_app.models import User
@@ -55,3 +56,12 @@ class IssueWriteSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'projectId', 'title', 'description', 'status', 'severity', 'assigneeId', 'reporterId', 'dueDate'
         ]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    authorName = serializers.CharField(source='author.complete_name', read_only=True)
+    createdAt = serializers.DateTimeField(source='created_at', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'createdAt', 'authorName', 'body']
