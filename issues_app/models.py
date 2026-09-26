@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-# Create your models here.
+
 class Issue(models.Model):
     class StatusChoices(models.TextChoices):
         OPEN = 'open', 'Open'

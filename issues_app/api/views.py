@@ -16,6 +16,7 @@ from .permissions import IsProjectMemberForComment, IsCommentAuthor
 
 
 class IssueViewSet(viewsets.ModelViewSet):
+    lookup_url_kwarg = 'issueId'
     def get_queryset(self):
         return Issue.objects.all()
 
@@ -36,7 +37,7 @@ class IssueViewSet(viewsets.ModelViewSet):
         issue = self.get_object()
         write_serializer = IssueWriteSerializer(issue, data=request.data, partial=True)
         write_serializer.is_valid(raise_exception=True)
-        issue = write_serializer
+        issue = write_serializer.save()
 
         read_serializer = IssueSerializer(issue)
         return Response(read_serializer.data, status=status.HTTP_200_OK)
@@ -67,9 +68,10 @@ class ReportedByMeView(mixins.ListModelMixin, generics.GenericAPIView):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    lookup_url_kwarg = 'commentId'
 
     def get_queryset(self):
-        issue_id = self.kwargs.get('issue_id')
+        issue_id = self.kwargs.get('issueId')
         return Comment.objects.filter(issue_id=issue_id)
 
     def get_permissions(self):

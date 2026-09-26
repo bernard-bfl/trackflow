@@ -57,6 +57,21 @@ class IssueWriteSerializer(serializers.ModelSerializer):
             'id', 'projectId', 'title', 'description', 'status', 'severity', 'assigneeId', 'reporterId', 'dueDate'
         ]
 
+    def validate(self, data):
+        project = data.get('project')
+        assignee = data.get('assignee')
+        reporter = data.get('reporter')
+
+        if project:
+            valid_members = list(project.members.all()) + [project.owner]
+            if assignee and assignee not in valid_members:
+                raise serializers.ValidationError("assigneeId must belong to a member of the project")
+            
+            if reporter and reporter not in valid_members:
+                raise serializers.ValidationError("reporterId must belong to a member of the project")
+
+
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     authorName = serializers.CharField(source='author.complete_name', read_only=True)
